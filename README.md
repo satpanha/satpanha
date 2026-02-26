@@ -1,6 +1,5 @@
 ## Hi there 👋
 
-![Image](https://github.com/user-attachments/assets/b1cec95e-6b6e-4a47-bb47-b1bf4e3c5c87)
 
 <!--
 **satpanha/satpanha** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
