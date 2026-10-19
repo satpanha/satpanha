@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "title": "Sat Panha — Mission Control",
+    "description": "Portfolio of Sat Panha, Software Engineering student at CADT aiming for a DevOps internship."
+  },
+  "ui": {
+    "flatView": "Flat view",
+    "language": "Language",
+    "skipToContent": "Skip to content",
+    "sections": "Sections",
+    "inProgress": "In progress",
+    "planned": "Planned",
+    "role": "My role",
+    "stack": "Stack",
+    "level": "Level"
+  },
+  "sections": {
+    "home": {
+      "id": "home",
+      "body": "Sun",
+      "label": "Home",
+      "name": "Sat Panha",
+      "headline": "Aspiring DevOps engineer",
+      "pitch": "Software Engineering student at CADT, Phnom Penh. {{TODO: one-line pitch in your own words}}",
+      "links": [
+        { "label": "Email", "href": "{{TODO: email link}}" },
+        { "label": "GitHub", "href": "{{TODO: GitHub URL}}" },
+        { "label": "LinkedIn", "href": "{{TODO: LinkedIn URL}}" }
+      ]
+    },
+    "missions": {
+      "id": "missions",
+      "body": "Planet 1",
+      "label": "Missions",
+      "intro": "Case studies.",
+      "projects": [
+        {
+          "name": "Domrov LMS",
+          "summary": "{{TODO: what it is and who it is for}}",
+          "role": "{{TODO: your role}}",
+          "stack": ["{{TODO: stack}}"]
+        },
+        {
+          "name": "Multi-tenant CRM",
+          "summary": "Employer project. Architecture and my role only; no client names, data or screenshots.",
+          "role": "{{TODO: your role in one or two sentences}}",
+          "stack": ["NestJS", "PostgreSQL", "React", "RBAC", "Real-time updates", "Sales pipelines", "Quoting", "Reporting"]
+        },
+        {
+          "name": "Parental-control app",
+          "summary": "An app that uses an LLM on sensitive data, designed privacy-first: on-device processing where possible, minimal data sent to any LLM, no raw child content stored, transparent monitoring with explicit parental consent. Demos use synthetic data only.",
+          "role": "{{TODO: your role}}",
+          "stack": ["{{TODO: stack}}"]
+        },
+        {
+          "name": "devops-lab",
+          "summary": "A public repo of containerized apps and CI/CD pipelines built while learning DevOps. {{TODO: link and status once published}}",
+          "role": "{{TODO: your role}}",
+          "stack": ["Docker", "GitHub Actions", "Terraform", "AWS"]
+        }
+      ]
+    },
+    "infrastructure": {
+      "id": "infrastructure",
+      "body": "Planet 2",
+      "label": "Infrastructure",
+      "intro": "Skills with honest proficiency levels.",
+      "skills": [
+        { "name": "CI/CD", "level": "{{TODO: honest level}}" },
+        { "name": "Infrastructure as code", "level": "{{TODO: honest level}}" },
+        { "name": "Cloud", "level": "{{TODO: honest level}}" },
+        { "name": "Linux", "level": "{{TODO: honest level}}" },
+        { "name": "Networking", "level": "{{TODO: honest level}}" }
+      ]
+    },
+    "flightRecord": {
+      "id": "flight-record",
+      "body": "Planet 3",
+      "label": "Flight Record",
+      "intro": "Experience and education.",
+      "entries": [
+        {
+          "title": "Internship, CABS Consulting",
+          "dates": "{{TODO: dates}}",
+          "summary": "{{TODO: what you did; CI described accurately: local pre-commit checks with Husky, CI on GitHub}}"
+        },
+        {
+          "title": "Team-lead roles",
+          "dates": "{{TODO: dates}}",
+          "summary": "{{TODO: where and what}}"
+        },
+        {
+          "title": "Volunteer leadership",
+          "dates": "{{TODO: dates}}",
+          "summary": "{{TODO: where and what}}"
+        },
+        {
+          "title": "Software Engineering, CADT",
+          "dates": "{{TODO: dates}}",
+          "summary": "Cambodia Academy of Digital Technology, Phnom Penh. {{TODO: degree details}}"
+        }
+      ]
+    },
+    "credentials": {
+      "id": "credentials",
+      "body": "Planet 4",
+      "label": "Credentials",
+      "intro": "Nothing here is claimed as earned until I pass it.",
+      "items": [
+        { "name": "Terraform Associate", "status": "planned" },
+        { "name": "GitHub Actions", "status": "planned" },
+        { "name": "AWS Cloud Practitioner", "status": "planned" },
+        { "name": "CLLMSP (AI security)", "status": "planned" },
+        { "name": "KCNA", "status": "planned" },
+        { "name": "CCNA 1 coursework", "status": "{{TODO: completed or in progress}}" }
+      ],
+      "languages": "French (learning)"
+    },
+    "comms": {
+      "id": "comms",
+      "body": "Station",
+      "label": "Comms",
+      "intro": "Get in touch.",
+      "links": [
+        { "label": "Email", "href": "{{TODO: email link}}" },
+        { "label": "GitHub", "href": "{{TODO: GitHub URL}}" },
+        { "label": "LinkedIn", "href": "{{TODO: LinkedIn URL}}" },
+        { "label": "CV download", "href": "{{TODO: CV PDF path, public version}}" }
+      ]
+    }
+  }
+}

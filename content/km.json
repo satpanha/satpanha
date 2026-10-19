@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "title": "សាត ពញ្ញា — Mission Control",
+    "description": "ផតហ្វូលីយោរបស់ សាត ពញ្ញា និស្សិតវិស្វកម្មសូហ្វតវែរនៅ CADT ដែលកំពុងស្វែងរកកម្មសិក្សា DevOps។"
+  },
+  "ui": {
+    "flatView": "ទិដ្ឋភាពសាមញ្ញ",
+    "language": "ភាសា",
+    "skipToContent": "រំលងទៅមាតិកា",
+    "sections": "ផ្នែក",
+    "inProgress": "កំពុងរៀន",
+    "planned": "មានគម្រោង",
+    "role": "តួនាទីរបស់ខ្ញុំ",
+    "stack": "បច្ចេកវិទ្យា",
+    "level": "កម្រិត"
+  },
+  "sections": {
+    "home": {
+      "id": "home",
+      "body": "Sun",
+      "label": "ទំព័រដើម",
+      "name": "សាត ពញ្ញា",
+      "headline": "អ្នកស្វែងរកការងារជាវិស្វករ DevOps",
+      "pitch": "និស្សិតវិស្វកម្មសូហ្វតវែរនៅ CADT រាជធានីភ្នំពេញ។ {{TODO: សេចក្តីណែនាំខ្លីមួយបន្ទាត់}}",
+      "links": [
+        { "label": "អ៊ីមែល", "href": "{{TODO: email link}}" },
+        { "label": "GitHub", "href": "{{TODO: GitHub URL}}" },
+        { "label": "LinkedIn", "href": "{{TODO: LinkedIn URL}}" }
+      ]
+    },
+    "missions": {
+      "id": "missions",
+      "body": "Planet 1",
+      "label": "បេសកកម្ម",
+      "intro": "ករណីសិក្សា។",
+      "projects": [
+        {
+          "name": "Domrov LMS",
+          "summary": "{{TODO: ពណ៌នាគម្រោង}}",
+          "role": "{{TODO: តួនាទី}}",
+          "stack": ["{{TODO: stack}}"]
+        },
+        {
+          "name": "Multi-tenant CRM",
+          "summary": "គម្រោងរបស់និយោជក។ បង្ហាញតែស្ថាបត្យកម្ម និងតួនាទីរបស់ខ្ញុំប៉ុណ្ណោះ គ្មានឈ្មោះអតិថិជន ទិន្នន័យ ឬរូបថតអេក្រង់ទេ។",
+          "role": "{{TODO: តួនាទី}}",
+          "stack": ["NestJS", "PostgreSQL", "React", "RBAC", "Real-time updates", "Sales pipelines", "Quoting", "Reporting"]
+        },
+        {
+          "name": "កម្មវិធីត្រួតពិនិត្យដោយឪពុកម្តាយ",
+          "summary": "កម្មវិធីដែលប្រើ LLM លើទិន្នន័យរសើប ត្រូវបានរចនាដោយផ្តោតលើឯកជនភាព៖ ដំណើរការលើឧបករណ៍ផ្ទាល់ឱ្យបានច្រើនបំផុត ផ្ញើទិន្នន័យតិចបំផុតទៅ LLM មិនរក្សាទុកខ្លឹមសារដើមរបស់កុមារ និងមានតម្លាភាពជាមួយការយល់ព្រមពីមាតាបិតា។ ការបង្ហាញប្រើតែទិន្នន័យសំយោគប៉ុណ្ណោះ។",
+          "role": "{{TODO: តួនាទី}}",
+          "stack": ["{{TODO: stack}}"]
+        },
+        {
+          "name": "devops-lab",
+          "summary": "Repo សាធារណៈដែលមានកម្មវិធី containerized និង CI/CD pipelines ដែលខ្ញុំបង្កើតពេលរៀន DevOps។ {{TODO: តំណ និងស្ថានភាព}}",
+          "role": "{{TODO: តួនាទី}}",
+          "stack": ["Docker", "GitHub Actions", "Terraform", "AWS"]
+        }
+      ]
+    },
+    "infrastructure": {
+      "id": "infrastructure",
+      "body": "Planet 2",
+      "label": "ហេដ្ឋារចនាសម្ព័ន្ធ",
+      "intro": "ជំនាញ និងកម្រិតដែលពិតប្រាកដ។",
+      "skills": [
+        { "name": "CI/CD", "level": "{{TODO: កម្រិត}}" },
+        { "name": "Infrastructure as code", "level": "{{TODO: កម្រិត}}" },
+        { "name": "Cloud", "level": "{{TODO: កម្រិត}}" },
+        { "name": "Linux", "level": "{{TODO: កម្រិត}}" },
+        { "name": "Networking", "level": "{{TODO: កម្រិត}}" }
+      ]
+    },
+    "flightRecord": {
+      "id": "flight-record",
+      "body": "Planet 3",
+      "label": "កំណត់ត្រាដំណើរ",
+      "intro": "បទពិសោធន៍ និងការអប់រំ។",
+      "entries": [
+        {
+          "title": "កម្មសិក្សា CABS Consulting",
+          "dates": "{{TODO: កាលបរិច្ឆេទ}}",
+          "summary": "{{TODO: ការងារដែលបានធ្វើ}}"
+        },
+        {
+          "title": "តួនាទីជាអ្នកដឹកនាំក្រុម",
+          "dates": "{{TODO: កាលបរិច្ឆេទ}}",
+          "summary": "{{TODO: ទីកន្លែង និងការងារ}}"
+        },
+        {
+          "title": "ភាពជាអ្នកដឹកនាំស្ម័គ្រចិត្ត",
+          "dates": "{{TODO: កាលបរិច្ឆេទ}}",
+          "summary": "{{TODO: ទីកន្លែង និងការងារ}}"
+        },
+        {
+          "title": "វិស្វកម្មសូហ្វតវែរ CADT",
+          "dates": "{{TODO: កាលបរិច្ឆេទ}}",
+          "summary": "បណ្ឌិត្យសភាបច្ចេកវិទ្យាឌីជីថលកម្ពុជា ភ្នំពេញ។ {{TODO: ព័ត៌មានលម្អិត}}"
+        }
+      ]
+    },
+    "credentials": {
+      "id": "credentials",
+      "body": "Planet 4",
+      "label": "វិញ្ញាបនបត្រ",
+      "intro": "គ្មានអ្វីត្រូវបានអះអាងថាទទួលបានទេ រហូតដល់ខ្ញុំប្រឡងជាប់។",
+      "items": [
+        { "name": "Terraform Associate", "status": "planned" },
+        { "name": "GitHub Actions", "status": "planned" },
+        { "name": "AWS Cloud Practitioner", "status": "planned" },
+        { "name": "CLLMSP (AI security)", "status": "planned" },
+        { "name": "KCNA", "status": "planned" },
+        { "name": "CCNA 1 coursework", "status": "{{TODO: ស្ថានភាព}}" }
+      ],
+      "languages": "បារាំង (កំពុងរៀន)"
+    },
+    "comms": {
+      "id": "comms",
+      "body": "Station",
+      "label": "ទំនាក់ទំនង",
+      "intro": "សូមទាក់ទងមក។",
+      "links": [
+        { "label": "អ៊ីមែល", "href": "{{TODO: email link}}" },
+        { "label": "GitHub", "href": "{{TODO: GitHub URL}}" },
+        { "label": "LinkedIn", "href": "{{TODO: LinkedIn URL}}" },
+        { "label": "ទាញយក CV", "href": "{{TODO: CV PDF path}}" }
+      ]
+    }
+  }
+}
