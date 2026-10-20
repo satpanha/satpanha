@@ -452,3 +452,104 @@ export function resolveKeyboardAction(
 
   return null;
 }
+
+/**
+ * Compute starfield parallax offset relative to camera position.
+ * Under prefers-reduced-motion, parallax is strictly zero.
+ */
+export function getStarfieldParallaxOffset(
+  cameraPosition: Vec3,
+  reducedMotion: boolean
+): Vec3 {
+  if (reducedMotion) {
+    return { x: 0, y: 0, z: 0 };
+  }
+  return {
+    x: cameraPosition.x * 0.18,
+    y: cameraPosition.y * 0.18,
+    z: cameraPosition.z * 0.18,
+  };
+}
+
+/**
+ * Compute glow scale and opacity for interactive solar bodies.
+ * Under prefers-reduced-motion, pulsing glow is disabled (constant values).
+ */
+export function getBodyGlowPulse(
+  timeSec: number,
+  highlighted: boolean,
+  reducedMotion: boolean
+): { scale: number; opacity: number } {
+  const baseScale = highlighted ? 1.34 : 1.22;
+  const baseOpacity = highlighted ? 0.28 : 0.16;
+
+  if (reducedMotion) {
+    return { scale: baseScale, opacity: baseOpacity };
+  }
+
+  const wave = Math.sin(timeSec * 2.4);
+  const scaleAmplitude = highlighted ? 0.05 : 0.02;
+  const opacityAmplitude = highlighted ? 0.05 : 0.02;
+
+  return {
+    scale: baseScale + wave * scaleAmplitude,
+    opacity: baseOpacity + wave * opacityAmplitude,
+  };
+}
+
+export interface SolarSessionState {
+  locale: "en" | "km";
+  activeId: SectionId | null;
+  panelOpen: boolean;
+  cameraRig: CameraRigState;
+  simTimeSec: number;
+}
+
+export function createInitialSolarSession(
+  locale: "en" | "km" = "en"
+): SolarSessionState {
+  return {
+    locale,
+    activeId: null,
+    panelOpen: false,
+    cameraRig: {
+      position: { ...OVERVIEW_CAMERA.position },
+      target: { ...OVERVIEW_CAMERA.target },
+    },
+    simTimeSec: 0,
+  };
+}
+
+export function selectBodyInSession(
+  state: SolarSessionState,
+  id: SectionId,
+  reducedMotion = false
+): SolarSessionState {
+  const body = getBodyById(id);
+  const desired = body
+    ? getDesiredCameraForBody(body, state.simTimeSec)
+    : OVERVIEW_CAMERA;
+  return {
+    ...state,
+    activeId: id,
+    panelOpen: true,
+    cameraRig: reducedMotion
+      ? desired
+      : stepCameraFlight(state.cameraRig, desired, 0.25, false),
+  };
+}
+
+/**
+ * Switch site language without resetting the camera, focused body, or open panel.
+ */
+export function switchLocaleInSession(
+  state: SolarSessionState,
+  nextLocale: "en" | "km"
+): SolarSessionState {
+  if (state.locale === nextLocale) return state;
+  return {
+    ...state,
+    locale: nextLocale,
+  };
+}
+

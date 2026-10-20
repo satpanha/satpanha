@@ -5,32 +5,41 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useState,
   useSyncExternalStore,
 } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { FlatView } from "@/components/FlatView";
-import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { HudOverlay } from "@/components/HudOverlay";
 import { SidePanel } from "@/components/SidePanel";
+import {
+  getSceneQualityProfile,
+  readClientDeviceEnvironment,
+  resolveActiveViewMode,
+  SMALL_SCREEN_MAX_WIDTH,
+} from "@/lib/device";
 import { useLocale } from "@/lib/locale";
 import {
-  getBodyById,
   resolveKeyboardAction,
-  SOLAR_BODIES,
   type SectionId,
 } from "@/lib/solar-system";
 
-const SolarCanvas3D = dynamic(() => import("@/components/SolarCanvas3D"), {
-  ssr: false,
-  loading: () => (
+function SceneLoadingFallback() {
+  const { content: c } = useLocale();
+  return (
     <div
       className="flex h-full w-full items-center justify-center bg-bg"
       aria-live="polite"
     >
-      <span className="micro text-muted">INITIALIZING 3D TELEMETRY...</span>
+      <span className="micro text-muted">{c.ui.loadingScene}</span>
     </div>
-  ),
+  );
+}
+
+const SolarCanvas3D = dynamic(() => import("@/components/SolarCanvas3D"), {
+  ssr: false,
+  loading: () => <SceneLoadingFallback />,
 });
 
 class CanvasErrorBoundary extends Component<
@@ -84,29 +93,34 @@ function getReducedMotionServerSnapshot(): boolean {
   return false;
 }
 
-function subscribeMobileViewport(onStoreChange: () => void): () => void {
-  if (
-    typeof window === "undefined" ||
-    typeof window.matchMedia !== "function"
-  ) {
+function subscribeViewportWidth(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") {
     return () => {};
   }
-  const mql = window.matchMedia("(max-width: 639px)");
-  mql.addEventListener("change", onStoreChange);
-  return () => mql.removeEventListener("change", onStoreChange);
+  window.addEventListener("resize", onStoreChange);
+  return () => window.removeEventListener("resize", onStoreChange);
 }
 
-function getMobileViewportSnapshot(): boolean {
-  if (
-    typeof window === "undefined" ||
-    typeof window.matchMedia !== "function"
-  ) {
-    return false;
+function getViewportWidthSnapshot(): number {
+  if (typeof window === "undefined") {
+    return 1280;
   }
-  return window.matchMedia("(max-width: 639px)").matches;
+  return window.innerWidth || 1280;
 }
 
-function getMobileViewportServerSnapshot(): boolean {
+function getViewportWidthServerSnapshot(): number {
+  return 1280;
+}
+
+function subscribeHydrated(): () => void {
+  return () => {};
+}
+
+function getHydratedClientSnapshot(): boolean {
+  return true;
+}
+
+function getHydratedServerSnapshot(): boolean {
   return false;
 }
 
@@ -114,25 +128,63 @@ export function SolarScene() {
   const { content: c } = useLocale();
   const s = c.sections;
 
+  const isHydrated = useSyncExternalStore(
+    subscribeHydrated,
+    getHydratedClientSnapshot,
+    getHydratedServerSnapshot
+  );
+
   const prefersReducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
     getReducedMotionSnapshot,
     getReducedMotionServerSnapshot
   );
 
-  const isMobile = useSyncExternalStore(
-    subscribeMobileViewport,
-    getMobileViewportSnapshot,
-    getMobileViewportServerSnapshot
+  const viewportWidth = useSyncExternalStore(
+    subscribeViewportWidth,
+    getViewportWidthSnapshot,
+    getViewportWidthServerSnapshot
   );
 
-  const [viewOverride, setViewOverride] = useState<"3d" | "flat" | null>(null);
+  const [viewOverride, setViewOverride] = useState<"3d" | "flat" | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const view = params.get("view");
+      if (view === "3d" || view === "flat") return view;
+    } catch {
+      /* ignore */
+    }
+    return null;
+  });
+
   const [activeId, setActiveId] = useState<SectionId | null>(null);
   const [hoveredId, setHoveredId] = useState<SectionId | null>(null);
 
-  const isFlatMode = viewOverride
-    ? viewOverride === "flat"
-    : prefersReducedMotion;
+  const deviceEnv = useMemo(() => {
+    if (!isHydrated) {
+      return {
+        prefersReducedMotion,
+        webglAvailable: true,
+        viewportWidth,
+      };
+    }
+    const env = readClientDeviceEnvironment(prefersReducedMotion);
+    return {
+      ...env,
+      viewportWidth,
+    };
+  }, [isHydrated, prefersReducedMotion, viewportWidth]);
+
+  const qualityProfile = useMemo(
+    () => getSceneQualityProfile(deviceEnv),
+    [deviceEnv]
+  );
+
+  const activeViewMode = resolveActiveViewMode(deviceEnv, viewOverride);
+  const isFlatMode = activeViewMode === "flat";
+  const isMobile =
+    qualityProfile.isTouchOrCompact || viewportWidth <= SMALL_SCREEN_MAX_WIDTH;
 
   const selectBody = useCallback((id: SectionId) => {
     setActiveId(id);
@@ -144,6 +196,14 @@ export function SolarScene() {
 
   const handleCanvasError = useCallback(() => {
     setViewOverride("flat");
+  }, []);
+
+  const switchToFlat = useCallback(() => {
+    setViewOverride("flat");
+  }, []);
+
+  const switchTo3D = useCallback(() => {
+    setViewOverride("3d");
   }, []);
 
   // Keyboard navigation: 1-6 keys, Arrow keys, Escape
@@ -181,25 +241,10 @@ export function SolarScene() {
   if (isFlatMode) {
     return (
       <div key="flat-mode">
-        <div className="border-b border-[var(--hairline)] bg-bg/95 px-4 py-2">
-          <div className="mx-auto flex max-w-4xl items-center justify-between">
-            <span className="micro text-muted">{c.ui.flatView}</span>
-            <button
-              type="button"
-              onClick={() => setViewOverride("3d")}
-              className="micro border border-accent bg-accent/10 px-3 py-1"
-            >
-              Mission Control (3D)
-            </button>
-          </div>
-        </div>
-        <FlatView />
+        <FlatView onSwitchTo3D={switchTo3D} />
       </div>
     );
   }
-
-  const activeBody = getBodyById(activeId);
-  const activeSection = activeBody ? s[activeBody.sectionKey] : null;
 
   return (
     <div
@@ -220,6 +265,7 @@ export function SolarScene() {
           hoveredId={hoveredId}
           reducedMotion={prefersReducedMotion}
           isMobile={isMobile}
+          qualityProfile={qualityProfile}
           sections={s}
           canvasAriaLabel={c.meta.title}
           onSelectBody={selectBody}
@@ -227,100 +273,23 @@ export function SolarScene() {
         />
       </CanvasErrorBoundary>
 
-      {/* Top HUD Bar */}
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-20 flex flex-wrap items-center justify-between gap-2 border-b border-[var(--hairline)] bg-bg/85 px-4 py-2.5 backdrop-blur-sm">
-        <div className="pointer-events-auto flex items-center gap-4">
-          <button
-            type="button"
-            onClick={returnToOverview}
-            className="micro text-left hover:text-fg"
-          >
-            Mission Control // {s.home.name}
-          </button>
-          <span className="micro hidden text-muted sm:inline" aria-live="polite">
-            {activeSection
-              ? `TARGET: ${activeSection.body} — ${activeSection.label}`
-              : `MODE: ${c.ui.sections}`}
-          </span>
-        </div>
-
-        <div className="pointer-events-auto flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setViewOverride("flat")}
-            className="micro border border-[var(--hairline)] px-3 py-1 text-muted hover:border-accent hover:text-fg"
-          >
-            {c.ui.flatView}
-          </button>
-          <Link
-            href="/flat/"
-            className="micro hidden border border-[var(--hairline)] px-3 py-1 text-muted hover:border-accent hover:text-fg sm:inline-block"
-          >
-            /flat
-          </Link>
-          <LanguageSwitch />
-        </div>
-      </header>
+      {/* Hairline-bordered Corner HUD Panels, Language Switch & Telemetry */}
+      <HudOverlay
+        activeId={activeId}
+        reducedMotion={prefersReducedMotion}
+        onSelectBody={selectBody}
+        onHoverBody={setHoveredId}
+        onOverview={returnToOverview}
+        onSwitchToFlat={switchToFlat}
+      />
 
       {/* Side Panel for Active Body Section */}
       <SidePanel
         activeId={activeId}
+        reducedMotion={prefersReducedMotion}
         onSelectBody={selectBody}
         onClose={returnToOverview}
       />
-
-      {/* Bottom Body Selector Dock (Keyboard + Mouse + Touch Reachable) */}
-      <nav
-        id="solar-nav"
-        aria-label={c.ui.sections}
-        className="pointer-events-auto fixed inset-x-0 bottom-0 z-20 border-t border-[var(--hairline)] bg-bg/90 px-3 py-2 backdrop-blur-sm"
-      >
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
-          <ul className="flex flex-wrap items-center gap-1.5">
-            <li>
-              <button
-                type="button"
-                onClick={returnToOverview}
-                aria-pressed={activeId === null}
-                className={`micro border px-2.5 py-1 ${
-                  activeId === null
-                    ? "border-accent bg-accent/15 text-fg"
-                    : "border-[var(--hairline)] text-muted hover:border-accent hover:text-fg"
-                }`}
-              >
-                [ESC] ALL
-              </button>
-            </li>
-            {SOLAR_BODIES.map((body) => {
-              const sec = s[body.sectionKey];
-              const isSelected = activeId === body.id;
-              return (
-                <li key={body.id}>
-                  <button
-                    type="button"
-                    onClick={() => selectBody(body.id)}
-                    onMouseEnter={() => setHoveredId(body.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    aria-pressed={isSelected}
-                    aria-label={`${sec.body}: ${sec.label} (${body.shortcut})`}
-                    className={`micro border px-2.5 py-1 ${
-                      isSelected
-                        ? "border-accent bg-accent/15 text-fg"
-                        : "border-[var(--hairline)] text-muted hover:border-accent hover:text-fg"
-                    }`}
-                  >
-                    [{body.shortcut}] {sec.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-
-          <p className="micro hidden text-muted lg:block">
-            KEYS: 1–6 · ←/→ · ESC
-          </p>
-        </div>
-      </nav>
     </div>
   );
 }

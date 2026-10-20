@@ -14,10 +14,12 @@ import type { Content } from "@/lib/content";
 import {
   generateStarfield,
   getBodyById,
+  getBodyGlowPulse,
   getBodyPosition,
   getDesiredCameraForBody,
   getDesiredOverviewCamera,
   getOrbitPoints,
+  getStarfieldParallaxOffset,
   OVERVIEW_CAMERA,
   SOLAR_BODIES,
   stepCameraFlight,
@@ -26,6 +28,7 @@ import {
   type SolarBody,
   type Vec3,
 } from "@/lib/solar-system";
+import type { SceneQualityProfile } from "@/lib/device";
 
 // Suppress Three.js r183+ Clock deprecation warning triggered internally by @react-three/fiber store creation
 if (typeof THREE.setConsoleFunction === "function") {
@@ -46,6 +49,7 @@ export interface SolarCanvas3DProps {
   hoveredId: SectionId | null;
   reducedMotion: boolean;
   isMobile: boolean;
+  qualityProfile?: SceneQualityProfile;
   sections: Content["sections"];
   canvasAriaLabel: string;
   onSelectBody: (id: SectionId) => void;
@@ -131,12 +135,9 @@ function StarfieldPoints({
   useFrame(({ camera }, delta) => {
     const pts = pointsRef.current;
     if (!pts) return;
-    // Light parallax relative to camera position
-    pts.position.set(
-      camera.position.x * 0.18,
-      camera.position.y * 0.18,
-      camera.position.z * 0.18
-    );
+    // Light parallax relative to camera position (disabled under reducedMotion)
+    const offset = getStarfieldParallaxOffset(camera.position, reducedMotion);
+    pts.position.set(offset.x, offset.y, offset.z);
     if (!reducedMotion) {
       pts.rotation.y += Math.min(delta, 0.1) * 0.008;
     }
@@ -209,8 +210,10 @@ interface BodyNodeProps {
   isSelected: boolean;
   isHovered: boolean;
   isMobile: boolean;
+  reducedMotion: boolean;
   onGroupRef: (el: THREE.Group | null) => void;
   onSpinRef: (el: THREE.Group | null) => void;
+  onGlowRef: (el: THREE.Mesh | null) => void;
   onSelectBody: (id: SectionId) => void;
   onHoverBody: (id: SectionId | null) => void;
 }
@@ -220,14 +223,17 @@ function SolarBodyNode({
   isSelected,
   isHovered,
   isMobile,
+  reducedMotion,
   onGroupRef,
   onSpinRef,
+  onGlowRef,
   onSelectBody,
   onHoverBody,
 }: BodyNodeProps) {
   const initialPos = useMemo(() => getBodyPosition(body, 0), [body]);
   const sphereSegments = isMobile ? 18 : 32;
   const highlighted = isSelected || isHovered;
+  const initialGlow = getBodyGlowPulse(0, highlighted, reducedMotion);
 
   return (
     <group
@@ -250,25 +256,27 @@ function SolarBodyNode({
         }}
       >
         {body.kind === "star" && (
-          <>
-            <mesh>
-              <sphereGeometry
-                args={[body.radius, sphereSegments, sphereSegments]}
-              />
-              <meshBasicMaterial color={body.color} />
-            </mesh>
-            <mesh scale={highlighted ? 1.38 : 1.24}>
-              <sphereGeometry
-                args={[body.radius, sphereSegments, sphereSegments]}
-              />
-              <meshBasicMaterial
-                color={body.accentColor}
-                transparent
-                opacity={highlighted ? 0.3 : 0.18}
-                depthWrite={false}
-              />
-            </mesh>
-          </>
+          <mesh>
+            <sphereGeometry
+              args={[body.radius, sphereSegments, sphereSegments]}
+            />
+            <meshBasicMaterial color={body.color} />
+          </mesh>
+        )}
+
+        {/* Interactive glow shell (pulses subtly only when !reducedMotion) */}
+        {(body.kind === "star" || highlighted) && (
+          <mesh ref={onGlowRef} scale={initialGlow.scale}>
+            <sphereGeometry
+              args={[body.radius, sphereSegments, sphereSegments]}
+            />
+            <meshBasicMaterial
+              color={body.accentColor}
+              transparent
+              opacity={initialGlow.opacity}
+              depthWrite={false}
+            />
+          </mesh>
         )}
 
         {body.kind === "planet" && (
@@ -404,6 +412,7 @@ function SolarSystemRig({
   const controlsRef = useRef<OrbitControlsInstance | null>(null);
   const bodyGroupRefs = useRef<(THREE.Group | null)[]>([]);
   const bodySpinRefs = useRef<(THREE.Group | null)[]>([]);
+  const bodyGlowRefs = useRef<(THREE.Mesh | null)[]>([]);
   const projVec = useMemo(() => new THREE.Vector3(), []);
   const camDir = useMemo(() => new THREE.Vector3(), []);
   const bodyPosVec = useMemo(() => new THREE.Vector3(), []);
@@ -448,6 +457,16 @@ function SolarSystemRig({
       const spin = bodySpinRefs.current[i];
       if (spin && !reducedMotion) {
         spin.rotation.y += dtSec * (body.kind === "star" ? 0.12 : 0.35);
+      }
+      const glowMesh = bodyGlowRefs.current[i];
+      if (glowMesh) {
+        const isHighlighted = activeId === body.id || hoveredId === body.id;
+        const glow = getBodyGlowPulse(nowSec, isHighlighted, reducedMotion);
+        glowMesh.scale.setScalar(glow.scale);
+        const mat = glowMesh.material;
+        if (mat && !Array.isArray(mat) && "opacity" in mat) {
+          mat.opacity = glow.opacity;
+        }
       }
     }
 
@@ -571,11 +590,17 @@ function SolarSystemRig({
       <OrbitControls
         ref={controlsRef}
         makeDefault
+        enableRotate
+        enableZoom
         enablePan={false}
         enableDamping={!reducedMotion}
         dampingFactor={0.08}
         minDistance={2.2}
         maxDistance={58}
+        touches={{
+          ONE: THREE.TOUCH.ROTATE,
+          TWO: THREE.TOUCH.DOLLY_PAN,
+        }}
         onStart={() => {
           flightRef.current.inFlight = false;
         }}
@@ -596,11 +621,15 @@ function SolarSystemRig({
           isSelected={activeId === body.id}
           isHovered={hoveredId === body.id}
           isMobile={isMobile}
+          reducedMotion={reducedMotion}
           onGroupRef={(el) => {
             bodyGroupRefs.current[idx] = el;
           }}
           onSpinRef={(el) => {
             bodySpinRefs.current[idx] = el;
+          }}
+          onGlowRef={(el) => {
+            bodyGlowRefs.current[idx] = el;
           }}
           onSelectBody={onSelectBody}
           onHoverBody={onHoverBody}
@@ -635,7 +664,7 @@ export default function SolarCanvas3D(props: SolarCanvas3DProps) {
         }`}
     >
       <Canvas
-        dpr={props.isMobile ? [1, 1.5] : [1, 2]}
+        dpr={props.qualityProfile ? props.qualityProfile.dpr : props.isMobile ? [1, 1.25] : [1, 2]}
         camera={{
           position: [
             OVERVIEW_CAMERA.position.x,
@@ -646,7 +675,10 @@ export default function SolarCanvas3D(props: SolarCanvas3DProps) {
           near: 0.1,
           far: 220,
         }}
-        gl={{ antialias: !props.isMobile, powerPreference: "high-performance" }}
+        gl={{
+          antialias: props.qualityProfile ? props.qualityProfile.antialias : !props.isMobile,
+          powerPreference: "high-performance",
+        }}
       >
         <SolarSystemRig
           activeId={props.activeId}
