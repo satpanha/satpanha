@@ -31,7 +31,7 @@ export interface FlatViewProps {
   onSwitchTo3D?: () => void;
 }
 
-export function FlatView({ onSwitchTo3D }: FlatViewProps = {}) {
+export function FlatView({ onSwitchTo3D }: FlatViewProps) {
   const { content: c } = useLocale();
   const s = c.sections;
   const nav = [s.home, s.missions, s.infrastructure, s.flightRecord, s.credentials, s.comms];

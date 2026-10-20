@@ -2,7 +2,7 @@
 
 Interactive solar-system portfolio (Next.js static export). Built in stages; see the spec for the plan.
 
-**Status:** Stage 2 of 6 — 3D solar-system scene (`@react-three/fiber` + `@react-three/drei`), starfield, orbits, camera flights, side panel, and keyboard controls.
+**Status:** Stage 3 of 6 — Mission Control HUD (corner panels, focused body readout, key hints, `/telemetry.json` reader), persisted EN/ខ្មែរ switch in HUD, mobile/low-power/WebGL fallback, and reduced-motion handling.
 
 ## Run
 
