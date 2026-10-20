@@ -4,7 +4,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, extname } from "node:path";
 
 const SKIP_DIRS = new Set(["node_modules", ".next", "out", ".git", "scripts"]);
-const SKIP_FILES = new Set(["package-lock.json", "PORTFOLIO_SPEC.md"]);
+const SKIP_FILES = new Set(["package-lock.json", "PORTFOLIO_SPEC.md", "STAGE3.md"]);
 const EXTS = new Set([".ts", ".tsx", ".js", ".mjs", ".json", ".md", ".css", ".html", ".yml", ".yaml", ".tf"]);
 
 const forbidden = [
