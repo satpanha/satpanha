@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { TelemetryPanel } from "@/components/TelemetryPanel";
 import { useLocale } from "@/lib/locale";
 import { isPlaceholder } from "@/lib/content";
 
@@ -25,7 +27,11 @@ function LinkList({ links }: { links: { label: string; href: string }[] }) {
   );
 }
 
-export function FlatView() {
+export interface FlatViewProps {
+  onSwitchTo3D?: () => void;
+}
+
+export function FlatView({ onSwitchTo3D }: FlatViewProps = {}) {
   const { content: c } = useLocale();
   const s = c.sections;
   const nav = [s.home, s.missions, s.infrastructure, s.flightRecord, s.credentials, s.comms];
@@ -33,22 +39,46 @@ export function FlatView() {
   return (
     <>
       <a href="#main" className="sr-only focus:not-sr-only micro p-2">{c.ui.skipToContent}</a>
-      <header className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
-        <p className="micro">Mission Control / {c.ui.flatView}</p>
-        <LanguageSwitch />
+      <header className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3 border-b border-[var(--hairline)] px-4 py-4">
+        <p className="micro">{c.ui.missionControl} / {c.ui.flatView}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          {onSwitchTo3D ? (
+            <button
+              type="button"
+              onClick={onSwitchTo3D}
+              aria-label={c.ui.threeDView}
+              className="micro border border-accent bg-accent/10 px-3 py-1 text-fg hover:bg-accent/20"
+            >
+              {c.ui.threeDView}
+            </button>
+          ) : (
+            <Link
+              href="/?view=3d"
+              aria-label={c.ui.threeDView}
+              className="micro border border-accent bg-accent/10 px-3 py-1 text-fg hover:bg-accent/20"
+            >
+              {c.ui.threeDView}
+            </Link>
+          )}
+          <LanguageSwitch />
+        </div>
       </header>
 
-      <nav aria-label={c.ui.sections} className="mx-auto max-w-4xl px-4">
+      <nav aria-label={c.ui.sections} className="mx-auto max-w-4xl px-4 pt-4">
         <ul className="flex flex-wrap gap-x-5 gap-y-1">
           {nav.map((n) => (
-            <li key={n.id}><a className="micro underline underline-offset-4" href={`#${n.id}`}>{n.label}</a></li>
+            <li key={n.id}>
+              <a className="micro underline underline-offset-4" href={`#${n.id}`}>
+                {n.body} · {n.label}
+              </a>
+            </li>
           ))}
         </ul>
       </nav>
 
       <main id="main" className="mx-auto max-w-4xl space-y-10 px-4 py-8">
         <section id={s.home.id} aria-labelledby="h-home">
-          <p className="micro">{s.home.label}</p>
+          <p className="micro">{s.home.body} · {s.home.label}</p>
           <h1 id="h-home" className="mt-2 text-4xl font-semibold">{s.home.name}</h1>
           <p className="mt-1 text-xl text-accent">{s.home.headline}</p>
           <p className="mt-3 text-muted"><Text value={s.home.pitch} /></p>
@@ -56,7 +86,7 @@ export function FlatView() {
         </section>
 
         <section id={s.missions.id} aria-labelledby="h-missions">
-          <p className="micro">{s.missions.label}</p>
+          <p className="micro">{s.missions.body} · {s.missions.label}</p>
           <h2 id="h-missions" className="mt-2 text-2xl font-semibold">{s.missions.intro}</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {s.missions.projects.map((p) => (
@@ -71,7 +101,7 @@ export function FlatView() {
         </section>
 
         <section id={s.infrastructure.id} aria-labelledby="h-infra">
-          <p className="micro">{s.infrastructure.label}</p>
+          <p className="micro">{s.infrastructure.body} · {s.infrastructure.label}</p>
           <h2 id="h-infra" className="mt-2 text-2xl font-semibold">{s.infrastructure.intro}</h2>
           <ul className="mt-4 divide-y divide-white/10 border border-[var(--hairline)]">
             {s.infrastructure.skills.map((k) => (
@@ -84,7 +114,7 @@ export function FlatView() {
         </section>
 
         <section id={s.flightRecord.id} aria-labelledby="h-flight">
-          <p className="micro">{s.flightRecord.label}</p>
+          <p className="micro">{s.flightRecord.body} · {s.flightRecord.label}</p>
           <h2 id="h-flight" className="mt-2 text-2xl font-semibold">{s.flightRecord.intro}</h2>
           <ol className="mt-4 space-y-4">
             {s.flightRecord.entries.map((e) => (
@@ -98,7 +128,7 @@ export function FlatView() {
         </section>
 
         <section id={s.credentials.id} aria-labelledby="h-cred">
-          <p className="micro">{s.credentials.label}</p>
+          <p className="micro">{s.credentials.body} · {s.credentials.label}</p>
           <h2 id="h-cred" className="mt-2 text-2xl font-semibold">{s.credentials.intro}</h2>
           <ul className="mt-4 divide-y divide-white/10 border border-[var(--hairline)]">
             {s.credentials.items.map((i) => (
@@ -114,10 +144,12 @@ export function FlatView() {
         </section>
 
         <section id={s.comms.id} aria-labelledby="h-comms">
-          <p className="micro">{s.comms.label}</p>
+          <p className="micro">{s.comms.body} · {s.comms.label}</p>
           <h2 id="h-comms" className="mt-2 text-2xl font-semibold">{s.comms.intro}</h2>
           <LinkList links={s.comms.links} />
         </section>
+
+        <TelemetryPanel />
       </main>
     </>
   );

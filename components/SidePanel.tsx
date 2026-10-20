@@ -37,12 +37,14 @@ function LinkList({ links }: { links: { label: string; href: string }[] }) {
 
 export interface SidePanelProps {
   activeId: SectionId | null;
+  reducedMotion?: boolean;
   onSelectBody: (id: SectionId) => void;
   onClose: () => void;
 }
 
 export function SidePanel({
   activeId,
+  reducedMotion = false,
   onSelectBody,
   onClose,
 }: SidePanelProps) {
@@ -58,11 +60,13 @@ export function SidePanel({
   const nextBody = SOLAR_BODIES[(currentIdx + 1) % SOLAR_BODIES.length];
 
   const sectionMeta = s[body.sectionKey];
+  const prevMeta = prevBody ? s[prevBody.sectionKey] : null;
+  const nextMeta = nextBody ? s[nextBody.sectionKey] : null;
 
   return (
     <aside
       aria-label={`${sectionMeta.body} — ${sectionMeta.label}`}
-      className="pointer-events-auto fixed inset-x-3 bottom-16 top-16 z-20 flex flex-col overflow-hidden border border-[var(--hairline)] bg-bg/92 backdrop-blur-md md:inset-x-auto md:bottom-16 md:right-4 md:top-16 md:w-[26rem] lg:w-[29rem]"
+      className="pointer-events-auto fixed inset-x-3 bottom-20 top-20 z-20 flex flex-col overflow-hidden border border-[var(--hairline)] bg-bg/92 backdrop-blur-md md:inset-x-auto md:bottom-20 md:right-3 md:top-16 md:w-[26rem] lg:w-[29rem]"
     >
       <div className="flex items-center justify-between border-b border-[var(--hairline)] px-4 py-3">
         <div className="flex items-center gap-2">
@@ -70,7 +74,7 @@ export function SidePanel({
             className="inline-block h-2.5 w-2.5 rounded-full"
             style={{
               backgroundColor: body.color,
-              boxShadow: `0 0 8px ${body.color}`,
+              boxShadow: reducedMotion ? "none" : `0 0 8px ${body.color}`,
             }}
             aria-hidden="true"
           />
@@ -82,7 +86,7 @@ export function SidePanel({
           <button
             type="button"
             onClick={() => prevBody && onSelectBody(prevBody.id)}
-            aria-label={`← ${prevBody?.shortcut ?? ""}`}
+            aria-label={`${c.ui.prevBody}: ${prevMeta ? `${prevMeta.body} — ${prevMeta.label}` : ""} (←)`}
             className="micro border border-[var(--hairline)] px-2 py-1 text-muted hover:border-accent hover:text-fg"
           >
             ←
@@ -90,7 +94,7 @@ export function SidePanel({
           <button
             type="button"
             onClick={() => nextBody && onSelectBody(nextBody.id)}
-            aria-label={`→ ${nextBody?.shortcut ?? ""}`}
+            aria-label={`${c.ui.nextBody}: ${nextMeta ? `${nextMeta.body} — ${nextMeta.label}` : ""} (→)`}
             className="micro border border-[var(--hairline)] px-2 py-1 text-muted hover:border-accent hover:text-fg"
           >
             →
@@ -98,7 +102,7 @@ export function SidePanel({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Esc"
+            aria-label={c.ui.closePanel}
             className="micro border border-[var(--hairline)] px-2.5 py-1 text-muted hover:border-accent hover:text-fg"
           >
             ESC
