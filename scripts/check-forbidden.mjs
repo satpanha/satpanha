@@ -4,6 +4,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, extname } from "node:path";
 
 const SKIP_DIRS = new Set(["node_modules", ".next", "out", ".git", "scripts"]);
+const SKIP_FILES = new Set(["package-lock.json", "PORTFOLIO_SPEC.md"]);
 const EXTS = new Set([".ts", ".tsx", ".js", ".mjs", ".json", ".md", ".css", ".html", ".yml", ".yaml", ".tf"]);
 
 const forbidden = [
@@ -19,7 +20,7 @@ function walk(dir, out = []) {
     const p = join(dir, name);
     const st = statSync(p);
     if (st.isDirectory()) walk(p, out);
-    else if (EXTS.has(extname(p)) && name !== "package-lock.json") out.push(p);
+    else if (EXTS.has(extname(p)) && !SKIP_FILES.has(name)) out.push(p);
   }
   return out;
 }

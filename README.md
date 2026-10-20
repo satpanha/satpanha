@@ -1,22 +1,44 @@
-# Mission Control — Sat Panha's portfolio
+<!-- Put this in a repo named exactly like your username (satpanha/satpanha) as README.md -->
+<!-- Lines marked TODO are things only you can confirm. Delete the comments before publishing. -->
 
-Interactive solar-system portfolio (Next.js static export). Built in stages; see the spec for the plan.
+# Hi, I'm Sat Panha 👋
 
-**Status:** Stage 1 of 6 — scaffold, tooling, EN/KM content, flat view.
+**Aspiring DevOps engineer** · Software Engineering student at CADT · Phnom Penh, Cambodia 🇰🇭
 
-## Run
+I build software and I care about the road from commit to production: fast, automated, and safe.
 
-```bash
-npm install
-npm run dev          # http://localhost:3000  (flat view at /flat)
-npm run lint && npm run typecheck && npm test && npm run build
-npm run check:forbidden   # fails if forbidden strings appear in the repo
-```
+## 🚀 What I'm working on
 
-## Content
+- **Parental-control mobile app**: uses an LLM to flag sensitive content on a child's device, designed privacy-first, with CI/CD from day one.
+- **`devops-lab`**: hands-on pipelines (GitHub Actions → containers → AWS), provisioned with Terraform. <!-- TODO: create this repo, then link it -->
 
-All text lives in `content/en.json` and `content/km.json`. Unfinished facts are `{{TODO: ...}}` placeholders and render in amber so they cannot be mistaken for real content. Fill them in; never guess.
+## 🌱 Currently learning
 
-## Local hooks vs CI
+Terraform · AWS · GitHub Actions · Docker · Kubernetes · LLM/AI security · French 🇫🇷
 
-Husky runs **locally** before a commit (lint-staged + typecheck, and commitlint on the message). Local hooks can be skipped (`--no-verify`), so the same checks run again **server-side in CI** (added in Stage 4), which is the real gate.
+## 🧰 Toolbox
+
+- **Languages:** TypeScript, Python
+- **Web:** React, NestJS, PostgreSQL
+- **Workflow:** Git, GitHub, Husky pre-commit checks <!-- TODO: add GitHub Actions only if you used it for CI -->
+- **Foundations:** Linux, Windows, networking (Cisco CCNA 1 coursework)
+
+## 🎯 Certifications
+
+In progress / planned: Terraform Associate · GitHub Actions · AWS Cloud Practitioner · CLLMSP
+
+## 🏗️ Selected projects
+
+| Project | What it is |
+|---|---|
+| **Domrov LMS** | Learning management system; I led the team and built the frontend. <!-- TODO: link repo --> |
+| **Multi-tenant CRM** | Internship project: NestJS, PostgreSQL, React, RBAC, sales pipelines, quoting. Private repo. |
+| **devops-lab** | CI/CD and infrastructure-as-code experiments. <!-- TODO: link --> |
+
+## 🌐 Languages
+
+Khmer (native) · English (professional working) · French (learning)
+
+## 📫 Find me
+
+[Portfolio](https://panha-portfolio-six.vercel.app/) · [LinkedIn](https://www.linkedin.com/in/sat-panha/)
